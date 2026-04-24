@@ -1,0 +1,89 @@
+extract_claims_task:
+  description: >
+    Read the article below and extract up to {max_claims} concise factual claims.
+    Focus on checkable statements involving events, dates, numbers, named
+    entities, causal claims, or other verifiable facts. Ignore pure opinions.
+
+    Article title:
+    {title}
+
+    Article text:
+    {article_text}
+  expected_output: >
+    A structured list of 3 to {max_claims} claims. Each claim should be concise,
+    specific, and suitable for later evidence lookup.
+
+build_supporting_case_task:
+  description: >
+    Use the extracted claims and the article text to build the strongest honest
+    case that the article may be reliable. Use the available research tool to
+    search for corroborating evidence. For each claim, provide a verdict,
+    confidence score, evidence summary, and source URLs when available.
+
+    You must not invent citations. If evidence is weak, say so clearly.
+
+    Article title:
+    {title}
+
+    Article text:
+    {article_text}
+  expected_output: >
+    A structured supporting case with stance set to supporting, one evidence
+    entry per claim, and a short strategic summary of why the article could be
+    credible.
+
+build_opposing_case_task:
+  description: >
+    Use the extracted claims and the article text to build the strongest honest
+    case that the article may be false or misleading. Use the available research
+    tool to search for contradicting or missing evidence. For each claim, provide
+    a verdict, confidence score, evidence summary, and source URLs when
+    available.
+
+    You must not invent citations. If evidence is weak, say so clearly.
+
+    Article title:
+    {title}
+
+    Article text:
+    {article_text}
+  expected_output: >
+    A structured skeptical case with stance set to opposing, one evidence entry
+    per claim, and a short strategic summary of why the article may be
+    unreliable.
+
+bias_analysis_task:
+  description: >
+    Analyze the article's tone, rhetoric, framing, and possible bias. Ignore
+    factual truth for this task. Focus on emotional language, sensationalism,
+    lack of counterarguments, vague attribution, and persuasive framing.
+
+    Article title:
+    {title}
+
+    Article text:
+    {article_text}
+  expected_output: >
+    A structured bias report with a tone label, a bias score from 0.0 to 1.0,
+    and a short list of concrete bias flags.
+
+issue_verdict_task:
+  description: >
+    Review the extracted claims, the supporting case, the opposing case, and the
+    bias analysis. Then issue a final verdict for the article.
+
+    The final label must be one of: REAL, FAKE, MIXED, UNVERIFIABLE.
+    Use MIXED when some claims are supported and others are contradicted.
+    Use UNVERIFIABLE when there is too little trustworthy evidence to decide.
+
+    You must also return a truth_score from 0.0 to 1.0:
+    - 1.0 means the article appears fully true and well supported
+    - 0.5 means the article is mixed, unclear, or only partly supported
+    - 0.0 means the article appears fully false or deeply misleading
+
+    Keep confidence separate from truth_score:
+    - truth_score = how true the article seems
+    - confidence = how certain you are in that assessment
+  expected_output: >
+    A structured final verdict with label, truth_score, confidence,
+    explanation, and a short summary of the major reasons behind the decision.

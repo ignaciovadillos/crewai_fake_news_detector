@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "detector-fake-news"
+version = "0.1.0"
+description = "Multi-agent fake news detector built with CrewAI."
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai>=1.14.1",
+    "python-dotenv>=1.0.1",
+    "pydantic>=2.7.0",
+    "pyyaml>=6.0.2",
+    "streamlit>=1.44.0",
+]
+
+[project.scripts]
+detector-fake-news = "detector_fake_news.main:run"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+detector_fake_news = ["config/*.yaml"]
+
+[tool.crewai]
+type = "crew"
