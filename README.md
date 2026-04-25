@@ -13,8 +13,6 @@ It analyzes one article through a sequential, courtroom-style workflow:
 4. `Bias Analyst` scores the tone and framing.
 5. `Judge` combines all prior outputs into a final REAL or FAKE verdict.
 
-This design keeps your original idea, but trims it into an MVP that is easier
-to explain, debug, and demo.
 
 ## Why this architecture
 
