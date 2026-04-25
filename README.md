@@ -16,13 +16,11 @@ It analyzes one article through a sequential, courtroom-style workflow:
 
 ## Why this architecture
 
-- It matches the assignment's recommendation for a sequential pipeline.
-- It is easy to inspect because each stage produces a structured output.
-- It leaves a clean path for later upgrades:
-  - parallel support vs. challenge research
-  - dataset evaluation
-  - Hugging Face classifier as an extra signal
-  - real Tavily/Serper search
+It leaves a clean path for later upgrades:
+- parallel support vs. challenge research
+- dataset evaluation
+- Hugging Face classifier as an extra signal
+- real Tavily/Serper search
 
 ## Project layout
 
