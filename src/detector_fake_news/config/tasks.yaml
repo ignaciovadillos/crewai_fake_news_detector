@@ -9,6 +9,9 @@ extract_claims_task:
 
     Article text:
     {article_text}
+
+    Local memory context:
+    {memory_context}
   expected_output: >
     A structured list of 3 to {max_claims} claims. Each claim should be concise,
     specific, and suitable for later evidence lookup.
@@ -21,12 +24,32 @@ build_supporting_case_task:
     confidence score, evidence summary, and source URLs when available.
 
     You must not invent citations. If evidence is weak, say so clearly.
+    Do not treat the article text by itself as independent verification.
+    For any SUPPORTED verdict, first look for external corroboration with the
+    research tool. If no trustworthy outside corroboration is found, use
+    UNVERIFIABLE instead of SUPPORTED. Include source_urls for every externally
+    corroborated claim, and leave them empty only when you explicitly explain
+    why no external evidence was found.
+
+    Evidence mode: {evidence_mode}
+    - online means the research tool searches live or public web sources.
+    - offline means the research tool searches the local labeled fake/real
+      article dataset. Treat offline results as similarity and style evidence,
+      not direct real-world verification.
+    - hybrid means the research tool returns both local dataset evidence and
+      online evidence.
 
     Article title:
     {title}
 
     Article text:
     {article_text}
+
+    Local memory context:
+    {memory_context}
+
+    Use local memory only as a hint about prior similar cases. Fresh evidence
+    from the current article and research tool should remain more important.
   expected_output: >
     A structured supporting case with stance set to supporting, one evidence
     entry per claim, and a short strategic summary of why the article could be
@@ -41,12 +64,29 @@ build_opposing_case_task:
     available.
 
     You must not invent citations. If evidence is weak, say so clearly.
+    Use the research tool before issuing a CONTRADICTED verdict when possible.
+    Include source_urls for every externally contradicted claim, and leave them
+    empty only when you explicitly explain why no external evidence was found.
+
+    Evidence mode: {evidence_mode}
+    - online means the research tool searches live or public web sources.
+    - offline means the research tool searches the local labeled fake/real
+      article dataset. Treat offline results as similarity and style evidence,
+      not direct real-world verification.
+    - hybrid means the research tool returns both local dataset evidence and
+      online evidence.
 
     Article title:
     {title}
 
     Article text:
     {article_text}
+
+    Local memory context:
+    {memory_context}
+
+    Use local memory only as a hint about prior similar cases. Fresh evidence
+    from the current article and research tool should remain more important.
   expected_output: >
     A structured skeptical case with stance set to opposing, one evidence entry
     per claim, and a short strategic summary of why the article may be
@@ -63,6 +103,12 @@ bias_analysis_task:
 
     Article text:
     {article_text}
+
+    Local memory context:
+    {memory_context}
+
+    Use local memory only as background for repeated rhetoric or framing
+    patterns. Do not assign bias solely because a prior article had a label.
   expected_output: >
     A structured bias report with a tone label, a bias score from 0.0 to 1.0,
     and a short list of concrete bias flags.
@@ -84,6 +130,38 @@ issue_verdict_task:
     Keep confidence separate from truth_score:
     - truth_score = how true the article seems
     - confidence = how certain you are in that assessment
+
+    Make the categorical label consistent with the numeric scores:
+    - If truth_score >= 0.75, the label should usually be REAL, not MIXED,
+      unless there is strong, specific contradictory evidence on at least one
+      major claim.
+    - If truth_score <= 0.25, the label should usually be FAKE, not MIXED,
+      unless there is strong, specific support for at least one major claim.
+    - Use MIXED only when there is meaningful evidence on both sides, or when
+      major claim verdicts are genuinely split between support and contradiction.
+    - Use UNVERIFIABLE when there is too little trustworthy external evidence
+      to make a strong decision.
+
+    Apply these label heuristics:
+    - REAL: most major claims are supported, major contradictions are absent or minor
+    - FAKE: major claims are contradicted or the article is substantially misleading
+    - MIXED: the article contains a meaningful mix of supported and contradicted claims
+    - UNVERIFIABLE: external evidence is too sparse, low quality, or missing
+
+    Before finalizing, double-check that label, truth_score, and confidence do
+    not contradict each other. High confidence and a high truth_score should not
+    normally end with a MIXED label.
+
+    Evidence mode: {evidence_mode}
+    In offline mode, be transparent that the verdict is based on local dataset
+    similarity, tone, and style signals rather than live factual verification.
+
+    Local memory context:
+    {memory_context}
+
+    Use local memory to improve consistency with prior similar analyses, but do
+    not copy prior labels blindly. Current article evidence, research results,
+    and the bias report should determine the final verdict.
   expected_output: >
     A structured final verdict with label, truth_score, confidence,
     explanation, and a short summary of the major reasons behind the decision.

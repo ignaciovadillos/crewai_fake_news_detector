@@ -4,21 +4,22 @@ from __future__ import annotations
 
 from typing import List
 
+from detector_fake_news.runtime import configure_runtime_environment
+
+configure_runtime_environment()
+
 from crewai import Agent, Crew, Process, Task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai.project import CrewBase, agent, crew, task
 
 from detector_fake_news.llm import get_llm
 from detector_fake_news.models import BiasReport, ClaimExtraction, FinalVerdict, LegalCase
-from detector_fake_news.runtime import configure_runtime_environment
 from detector_fake_news.tools import ArticleResearchTool
-
-configure_runtime_environment()
 
 
 @CrewBase
 class FakeNewsCrew:
-    """Sequential fake-news detection crew."""
+    """Fake-news detection crew with parallel evidence gathering."""
 
     agents: List[BaseAgent]
     tasks: List[Task]
@@ -93,6 +94,7 @@ class FakeNewsCrew:
             agent=self.supporting_counsel(),
             context=[self.extract_claims_task()],
             output_pydantic=LegalCase,
+            async_execution=True,
         )
 
     @task
@@ -102,6 +104,7 @@ class FakeNewsCrew:
             agent=self.opposing_counsel(),
             context=[self.extract_claims_task()],
             output_pydantic=LegalCase,
+            async_execution=True,
         )
 
     @task

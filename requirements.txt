@@ -1,0 +1,9 @@
+# Runtime dependencies for pip-based setup.
+# The editable project install in pyproject.toml remains the preferred setup:
+#   python -m pip install -e .
+
+crewai>=1.14.3
+python-dotenv>=1.2.2
+pydantic>=2.11.10
+PyYAML>=6.0.3
+streamlit>=1.57.0
